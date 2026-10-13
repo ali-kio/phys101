@@ -1,7 +1,7 @@
 /* اختبار منطق المراجعة وسلامة بيانات الفصول (node tests/test-core.js) */
 const assert = require('assert');
 global.window = undefined; global.localStorage = undefined;
-global.FIG = require('../js/core/fig.js'); global.VIS = require('../js/chapters/ch02-figs.js');
+global.FIG = require('../js/core/fig.js'); global.VIS = require('../js/chapters/ch02-figs.js'); global.VEC = require('../js/chapters/ch03-figs.js');
 const fs = require('fs'), path = require('path');
 global.CHAPTERS = [];
 fs.readdirSync(path.join(__dirname, '../js/chapters')).filter((f) => /^ch\d+\.js$/.test(f)).forEach((f) => require('../js/chapters/' + f));

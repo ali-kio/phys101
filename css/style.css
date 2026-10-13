@@ -282,3 +282,5 @@ details.lex .example{margin:8px 0 2px;box-shadow:none}
 .hlaws{margin-top:6px}.hlt{font-size:.74rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .hl{background:var(--surface);border-radius:10px;padding:6px 10px;margin:6px 0;overflow-x:auto}.hl b{font-size:.82rem}.hl .ftex{padding:0}
 .glos{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:.95rem}.glos div:nth-child(even){direction:rtl;text-align:right;font-family:"Tajawal",var(--font)}
+
+.v-arr.m{stroke:var(--muted)}.ah-m{fill:var(--muted)}.v-dash{stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 4;fill:none}.v-arc{fill:none;stroke:var(--ink);stroke-width:1.5}
