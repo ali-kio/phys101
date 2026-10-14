@@ -7,7 +7,7 @@ with sync_playwright() as p:
         pg = b.new_page(viewport=vp); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto(U); pg.wait_for_selector('.hero')
-        for r, sel in [('#/ch/ch02/learn', '.sec'), ('#/ch/ch03/learn', '.sec'), ('#/ch/ch03/formulas', '.formula'), ('#/ch/ch03/practice/5', '.q'), ('#/ch/ch02/practice/4', '.q'), ('#/laws', '.formula'), ('#/settings', '.seg'), ('#/print', 'form')]:
+        for r, sel in [('#/ch/ch02/learn', '.sec'), ('#/ch/ch03/learn', '.sec'), ('#/ch/ch03/formulas', '.formula'), ('#/ch/ch02/formulas', '.choose'), ('#/ch/ch03/formulas', '.pair'), ('#/ch/ch03/practice/5', '.q'), ('#/ch/ch02/practice/4', '.q'), ('#/laws', '.formula'), ('#/settings', '.seg'), ('#/print', 'form')]:
             pg.evaluate('h=>location.hash=h', r); pg.wait_for_selector(sel)
             assert not pg.evaluate('document.documentElement.scrollWidth>innerWidth'), ('hscroll', vp, r)
         pg.evaluate("location.hash='#/laws'"); pg.wait_for_selector('.formula')

@@ -13,3 +13,6 @@ Copy `ch02.js` shape into `ch03.js`, add `<script src="js/chapters/ch03.js"></sc
 
 ## Tests
 `node tests/test-core.js` (data + review logic). `python3 -m http.server 8765` then `python3 tests/e2e.py` (Playwright).
+
+## Chapter extensions (v4)
+`chNN-ext.js` loads after `chNN.js` and only adds: per-law `not`/`alt`/`from` and Arabic lines, `families` (law-family map cards), `chooser` ("which law do I use?"), `pairs` (easily confused), section `notebook` boxes, lesson-check questions (`cap`), Arabic for pitfalls, and `words` (tap/hover glossary). `node tests/test-core.js` checks that every law has "when not", an Arabic tip and a family, and every lesson has a notebook box and a lesson-check question.

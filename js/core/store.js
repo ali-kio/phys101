@@ -2,7 +2,7 @@
 (function (root) {
   'use strict';
   const KEY = 'phys101.v2';
-  const fresh = () => ({ v: 2, theme: 'auto', items: {}, stars: {}, mistakes: {}, read: {}, exam: null, hist: [] });
+  const fresh = () => ({ v: 2, theme: 'beige', items: {}, stars: {}, mistakes: {}, read: {}, exam: null, hist: [] });
   let mem = null;
   function load() {
     try { const s = localStorage.getItem(KEY); if (s) return Object.assign(fresh(), JSON.parse(s)); } catch (e) { /* ignore */ }

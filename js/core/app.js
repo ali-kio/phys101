@@ -28,7 +28,7 @@
     }
     return h;
   }
-  const trapCard = (ch, t) => { const g = ch.key + ':t:' + t.id; return `<div class="note pit" data-gid="${g}">${ic('alert')}<div><p>${t.html}</p></div>${U.star(g)}</div>`; };
+  const trapCard = (ch, t) => { const g = ch.key + ':t:' + t.id; return `<div class="note pit" data-gid="${g}">${ic('alert')}<div><p>${t.html}${t.ar ? `<span class="ar2">${t.ar}</span>` : ''}</p></div>${U.star(g)}</div>`; };
 
   /* ---------- shell: sidebar + bottom tabs ---------- */
   const TOOLS = [['#/laws', 'sigma', 'Formula sheet'], ['#/mistakes', 'notebook', 'Mistakes notebook'], ['#/saved', 'star', 'Saved'], ['#/exam', 'timer', 'Mock exam'], ['#/print', 'printer', 'Print sheets'], ['#/settings', 'sliders', 'Settings']];
@@ -84,12 +84,12 @@
       h += `<div class="row" style="margin-bottom:12px;justify-content:space-between"><span class="muted small">Tap a lesson to open it. Tap a topic inside to fold it.</span><span class="row"><button class="btn small ghost" data-act="expand" data-v="1">Open all</button><button class="btn small ghost" data-act="expand" data-v="0">Close all</button></span></div>`;
       h += c.sections.map((s, i) => {
         const done = ST.S.read[c.key + ':s:' + s.id];
-        return `<details class="sec" id="sec${s.id}" ${i === 0 ? 'open' : ''}><summary><span class="no">${done ? ic('check') : s.id}</span><span><h2>${esc(s.title)}</h2>${s.tr ? `<small>${s.tr}</small>` : ''}</span>${ic('chevron', 'chev')}</summary><div class="sbody">${U.blocks(c, s.blocks)}
+        return `<details class="sec" id="sec${s.id}" ${i === 0 ? 'open' : ''}><summary><span class="no">${done ? ic('check') : s.id}</span><span><h2>${esc(s.title)}</h2>${s.tr ? `<small>${s.tr}</small>` : ''}</span>${ic('chevron', 'chev')}</summary><div class="sbody">${U.blocks(c, s.blocks)}${U.sectionEnd(c, s)}
           <div class="row" style="margin-top:14px"><button class="btn small ${done ? 'ghost' : ''}" data-act="read" data-key="${c.key}:s:${s.id}">${ic('check')} ${done ? 'Marked as done' : 'Mark lesson as done'}</button><a class="btn small ghost" href="#/ch/${c.key}/practice/${s.id}">Practice this lesson</a></div></div></details>`;
       }).join('');
       if (c.videos && c.videos.length) h += '<h2>Suggested videos</h2><div class="list">' + c.videos.map((v) => `<a class="rowlink" target="_blank" rel="noopener" href="${esc(v.url)}"><span class="tx"><b>${esc(v.title)}</b></span></a>`).join('') + '</div>';
-    } else if (tab === 'formulas') h += lawsList([c]);
-    else if (tab === 'sheet') h += `<div class="note sum">${ic('bolt')}<div><span class="nl">3-minute review</span><ol style="margin:4px 0 0;padding-inline-start:20px">${c.quick.map((x) => `<li>${x}</li>`).join('')}</ol></div></div><h2>Pitfalls</h2>${c.traps.map((t) => trapCard(c, t)).join('')}${c.glossary ? `<h2>Key terms · المصطلحات</h2><div class="card glos">${c.glossary.map((g) => `<div>${g[0]}</div><div>${g[1]}</div>`).join('')}</div>` : ''}`;
+    } else if (tab === 'formulas') h += (c.families && c.families.length ? `<h2>Law families · map</h2><p class="muted small">One card per topic: which laws belong together, when to use them, and how they connect.</p>${c.families.map((f) => U.famCard(c, f)).join('')}${U.chooser(c)}${U.pairs(c)}<h2>All formulas</h2>` : '') + lawsList([c]);
+    else if (tab === 'sheet') h += `<div class="note sum">${ic('bolt')}<div><span class="nl">3-minute review</span><ol style="margin:4px 0 0;padding-inline-start:20px">${c.quick.map((x, i) => `<li>${x}${c.quickAr && c.quickAr[i] ? `<span class="ar2">${c.quickAr[i]}</span>` : ''}</li>`).join('')}</ol></div></div><h2>Pitfalls</h2>${c.traps.map((t) => trapCard(c, t)).join('')}${c.glossary ? `<h2>Key terms · المصطلحات</h2><div class="card glos">${c.glossary.map((g) => `<div>${g[0]}</div><div>${g[1]}</div>`).join('')}</div>` : ''}`;
     else h += topic ? practiceTopic(c, +topic) : practiceHome(c);
     return h;
   }
@@ -187,7 +187,7 @@
     const { ch, x } = IDX.l[g];
     return top + `<article class="fc" data-gid="${g}"><div class="qh"><span class="tag">Formula · Ch ${ch.id}</span><span class="sp"></span>${U.star(g)}</div>
       <div class="fq">${x.name}</div><p class="muted small">Recall the formula, then check.</p>
-      <div class="back" hidden><div class="ftex">$$${x.tex}$$</div>${x.note ? `<p class="small">${x.note}</p>` : ''}${x.when ? `<p class="small"><b>Use it when:</b> ${x.when}</p>` : ''}</div>
+      <div class="back" hidden>${U.ftex(x.tex)}${x.note ? `<p class="small">${x.note}</p>` : ''}${x.when ? `<p class="small"><b>Use it when:</b> ${x.when}</p>` : ''}</div>
       <div class="show"><button class="btn block" data-act="flip">Show formula</button></div>
       <div class="grade" hidden><button class="btn good" data-act="know" data-v="1">${ic('check')} Knew it</button><button class="btn bad" data-act="know" data-v="0">${ic('x')} Missed it</button></div></article>`;
   }
@@ -300,7 +300,7 @@
     chs.forEach((k) => {
       const c = chOf(k); h += `<section><h3>Chapter ${c.id} · ${esc(c.title)}</h3>`;
       if (has('laws')) h += c.laws.map(lawP).join('');
-      if (has('quick')) h += `<h4>3-minute review</h4><ol>${c.quick.map((x) => `<li>${x}</li>`).join('')}</ol>`;
+      if (has('quick')) h += `<h4>3-minute review</h4><ol>${c.quick.map((x, i) => `<li>${x}${c.quickAr && c.quickAr[i] ? `<span class="ar2">${c.quickAr[i]}</span>` : ''}</li>`).join('')}</ol>`;
       if (has('traps')) h += `<h4>Pitfalls</h4><ul>${c.traps.map((t) => `<li>${t.html}</li>`).join('')}</ul>`;
       h += '</section>';
     });
@@ -336,10 +336,15 @@
   }
 
   /* ---------- settings / more ---------- */
+  const THEMES = [['beige', 'Beige', 'light', '#f3ecdc', '#0f6b66'], ['white', 'Paper', 'light', '#f5f7fa', '#245fa8'], ['sage', 'Sage', 'light', '#edf1e8', '#35694a'], ['mist', 'Mist', 'light', '#eef0f5', '#4650a0'], ['dusk', 'Dusk', 'dark', '#1f242a', '#7cc4b9'], ['mocha', 'Mocha', 'dark', '#221e1a', '#d9b06b']];
+  const themeNow = () => { const t = ST.S.theme; return t === 'light' ? 'beige' : t === 'dark' ? 'dusk' : (t || 'auto'); };
+  const themeBtn = (t) => `<button class="themebtn ${themeNow() === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}" aria-label="${t[1]} theme" style="--sw-bg:${t[3]};--sw-ac:${t[4]}"><span class="sw"><i></i></span>${t[1]}</button>`;
   function viewSettings() {
     const n = IDX.all.length, bc = REV.boxCounts();
     return `${head('sliders', 'Settings')}<h2 style="margin-top:6px">Appearance</h2>
-      <div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map((t) => `<button class="${ST.S.theme === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>
+      <p class="muted small">Light themes</p><div class="themes">${THEMES.filter((t) => t[2] === 'light').map(themeBtn).join('')}</div>
+      <p class="muted small">Dark themes (soft)</p><div class="themes">${THEMES.filter((t) => t[2] === 'dark').map(themeBtn).join('')}</div>
+      <div class="seg" style="margin-top:8px"><button class="${themeNow() === 'auto' ? 'on' : ''}" data-act="theme" data-v="auto">Follow my device (Beige / Dusk)</button></div>
       <h2>Arabic explanations</h2><p class="muted small">Arabic explanations appear in the lessons, under every formula and in question hints. Terms stay in English.</p>
       <div class="seg"><button class="${!ST.S.noAr ? 'on' : ''}" data-act="ar" data-v="1">Show</button><button class="${ST.S.noAr ? 'on' : ''}" data-act="ar" data-v="0">Hide</button></div>
       <h2>Backup</h2><p class="muted small">Progress is stored in this browser only. To move it between phone, iPad and laptop, export a file and import it on the other device.</p>
@@ -387,7 +392,7 @@
 
   /* ---------- events ---------- */
   function applyTheme() {
-    const t = ST.S.theme; if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+    const t = themeNow(); if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t); const th = THEMES.find((x) => x[0] === t), mm = document.querySelector('meta[name=theme-color]'); if (mm) mm.content = th ? th[3] : '#f3ecdc';
     document.body.classList.toggle('no-ar', !!ST.S.noAr);
   }
   function download(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }

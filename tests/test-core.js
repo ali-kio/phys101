@@ -5,6 +5,7 @@ global.FIG = require('../js/core/fig.js'); global.VIS = require('../js/chapters/
 const fs = require('fs'), path = require('path');
 global.CHAPTERS = [];
 fs.readdirSync(path.join(__dirname, '../js/chapters')).filter((f) => /^ch\d+\.js$/.test(f)).forEach((f) => require('../js/chapters/' + f));
+fs.readdirSync(path.join(__dirname, '../js/chapters')).filter((f) => /^ch\d+-ext\.js$/.test(f)).forEach((f) => require('../js/chapters/' + f));
 const ST = require('../js/core/store.js'); global.STORE = ST;
 const REV = require('../js/core/review.js');
 REV.index(CHAPTERS);
@@ -48,3 +49,14 @@ CHAPTERS.forEach((ch) => ch.questions.forEach((q) => assert(q.ref && ['concept',
 console.log('META OK');
 CHAPTERS.forEach((ch) => ch.questions.forEach((q) => { assert(q.hint && q.hint.type && q.hint.ar, 'hint ' + q.id); q.hint.laws.forEach((i) => assert(ch.laws.some((l) => l.id === i), 'hint law ' + q.id)); }));
 console.log('HINTS OK');
+// 5) extensions: every law has "when NOT", Arabic tip, family membership; every lesson has a notebook box and a lesson-check question; traps have Arabic
+CHAPTERS.forEach((ch) => {
+  ch.laws.forEach((l) => { assert(l.not && l.notAr, 'law needs not/notAr ' + ch.key + ':' + l.id); assert(l.tipAr, 'law tipAr ' + l.id); });
+  assert(ch.families && ch.families.length, 'families ' + ch.key);
+  const inFam = new Set(); ch.families.forEach((f) => f.groups.forEach((g) => g.ids.forEach((i) => { assert(ch.laws.some((l) => l.id === i), 'fam law ' + i); inFam.add(i); })));
+  ch.laws.forEach((l) => assert(inFam.has(l.id), 'law not in a family: ' + ch.key + ':' + l.id));
+  ch.traps.forEach((t) => assert(t.ar, 'trap Arabic ' + t.id));
+  ch.sections.forEach((s) => { assert(s.notebook, 'notebook box in lesson ' + ch.key + ':' + s.id); assert(ch.questions.some((q) => q.cap && q.sec === s.id), 'lesson check ' + ch.key + ':' + s.id); });
+});
+CHAPTERS.forEach((ch) => { assert(ch.chooser.length >= 8 && ch.pairs.length >= 4, 'chooser/pairs ' + ch.key); ch.chooser.forEach((r) => assert(ch.laws.some((l) => l.id === r.law), 'chooser law ' + r.law)); });
+console.log('EXT OK');
